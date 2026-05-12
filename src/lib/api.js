@@ -18,4 +18,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Add response error logging for debugging
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      console.error(`API Error [${error.response.status}]:`, {
+        url: error.config.url,
+        method: error.config.method,
+        status: error.response.status,
+        message: error.response.data?.message || error.message,
+      });
+    } else if (error.request) {
+      console.error('API Error - No response:', {
+        url: error.config.url,
+        message: error.message,
+      });
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

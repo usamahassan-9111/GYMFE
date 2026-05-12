@@ -77,7 +77,7 @@ export default function AuthPage({ setToken }) {
           </button>
         </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] bg-cover bg-center p-6 sm:p-8" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80')" }}>
+        <div className="relative overflow-hidden rounded-[2rem] bg-cover bg-center p-6 sm:p-8" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&h=1000&fit=crop')" }}>
           <div className="absolute inset-0 bg-slate-950/75" />
           <div className="relative">
             <p className="text-xs uppercase tracking-[0.35em] text-slate-300">Mr Faisal Certified Gym Trainer</p>

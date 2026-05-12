@@ -1,11 +1,11 @@
-const heroImage = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1600&q=80';
+const heroImage = 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd';
 
 export default function Hero({ onExplore }) {
   return (
     <section id="home" className="relative overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-25 blur-[1px]"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        style={{ backgroundImage: `url('${heroImage}?w=1600&h=1200&fit=crop')` }}
       />
       <div className="absolute inset-0 bg-hero-grid" />
 
@@ -48,11 +48,12 @@ export default function Hero({ onExplore }) {
         <div className="relative">
           <div className="glass overflow-hidden rounded-[4rem] p-2 shadow-3xl">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[1.9rem]">
-             <img
-  src="/src/components/bodyimage.jpg"
-  alt="Gym interior"
-  className="h-full w-full object-cover"
-/>  
+              <img
+                src={heroImage}
+                alt="Gym interior"
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/15 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 rounded-2xl border border-white/10 bg-slate-950/70 p-4 backdrop-blur-md">
                 <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Premium Zone</p>

@@ -370,17 +370,36 @@ export default function DashboardPage({ token }) {
               <textarea value={memberForm.notes} onChange={(event) => setMemberForm({ ...memberForm, notes: event.target.value })} placeholder="Notes" className="form-input min-h-28 sm:col-span-2 resize-none" />
             </div>
             <button
-              onClick={() => submit(
-                memberEditId ? `/members/${memberEditId}` : '/members',
-                { ...memberForm, age: Number(memberForm.age) },
-                [members.refresh, stats.refresh],
-                () => {
-                  setMemberForm(emptyMemberForm());
-                  setMemberEditId('');
-                },
-                'member',
-                memberEditId ? 'put' : 'post'
-              )}
+              onClick={() => {
+                // Calculate due date from joining date and plan duration
+                let calculatedDueDate = memberForm.dueDate;
+                if (memberForm.joiningDate && memberForm.planId) {
+                  const selectedPlan = (plans.data || []).find(p => p._id === memberForm.planId);
+                  if (selectedPlan?.duration) {
+                    const joiningDate = new Date(memberForm.joiningDate);
+                    const dueDate = new Date(joiningDate);
+                    dueDate.setMonth(dueDate.getMonth() + Number(selectedPlan.duration));
+                    // Format as YYYY-MM-DD for API
+                    calculatedDueDate = dueDate.toISOString().split('T')[0];
+                  }
+                }
+                
+                submit(
+                  memberEditId ? `/members/${memberEditId}` : '/members',
+                  { 
+                    ...memberForm, 
+                    age: Number(memberForm.age),
+                    dueDate: calculatedDueDate || null
+                  },
+                  [members.refresh, stats.refresh],
+                  () => {
+                    setMemberForm(emptyMemberForm());
+                    setMemberEditId('');
+                  },
+                  'member',
+                  memberEditId ? 'put' : 'post'
+                );
+              }}
               disabled={busy === 'member'}
               className="btn-secondary mt-6 w-full"
             >

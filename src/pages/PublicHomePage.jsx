@@ -7,11 +7,15 @@ import ProductInquiryModal from '../components/ProductInquiryModal';
 import WhatsAppButton from '../components/WhatsAppButton';
 
 export default function PublicHomePage() {
-  const plans = useApiResource('/plans');
-  const products = useApiResource('/products/active');
+  const plansResource = useApiResource('/plans');
+  const productsResource = useApiResource('/products/active');
 
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Ensure data is always an array
+  const plans = Array.isArray(plansResource.data) ? plansResource.data : [];
+  const products = Array.isArray(productsResource.data) ? productsResource.data : [];
 
   const handleBuyClick = (product) => {
     setSelectedProduct(product);
@@ -50,8 +54,8 @@ export default function PublicHomePage() {
         subtitle="Choose the perfect membership plan for your fitness goals"
       >
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {plans.data && plans.data.length > 0 ? (
-            plans.data.map((plan, idx) => (
+          {plans.length > 0 ? (
+            plans.map((plan, idx) => (
               <div key={plan._id} className="glass rounded-3xl p-6 animate-scaleIn hover:scale-105 transition-transform" style={{ animationDelay: `${idx * 0.1}s` }}>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{plan.name}</p>
                 <p className="mt-3 text-3xl font-black text-sfBlue">Rs {plan.price}</p>
@@ -61,7 +65,7 @@ export default function PublicHomePage() {
                 </div>
               </div>
             ))
-          ) : plans.loading ? (
+          ) : plansResource.loading ? (
             <div className="col-span-full text-center py-8 text-slate-400">Loading plans...</div>
           ) : (
             <div className="col-span-full text-center py-8 text-slate-400">No plans available</div>
@@ -75,8 +79,8 @@ export default function PublicHomePage() {
         subtitle="High-quality protein powders, vitamins, and fitness supplements"
       >
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.data && products.data.length > 0 ? (
-            products.data.map((product, idx) => (
+          {products.length > 0 ? (
+            products.map((product, idx) => (
               <div key={product._id} className="glass rounded-3xl overflow-hidden animate-slideIn hover:scale-105 transition-transform group" style={{ animationDelay: `${idx * 0.1}s` }}>
                 {product.image && (
                   <div className="relative h-40 w-full bg-gradient-to-br from-sfBlue/20 to-sfRed/20 overflow-hidden">
@@ -104,7 +108,7 @@ export default function PublicHomePage() {
                 </div>
               </div>
             ))
-          ) : products.loading ? (
+          ) : productsResource.loading ? (
             <div className="col-span-full text-center py-8 text-slate-400">Loading products...</div>
           ) : (
             <div className="col-span-full text-center py-8 text-slate-400">No supplements available yet...</div>
