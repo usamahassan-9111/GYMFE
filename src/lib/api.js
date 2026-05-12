@@ -7,6 +7,7 @@ import axios from 'axios';
  */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api',
+  timeout: 10000, // 10 second timeout to prevent hanging
 });
 
 // Automatically add auth token from localStorage to all requests
@@ -31,9 +32,11 @@ api.interceptors.response.use(
       });
     } else if (error.request) {
       console.error('API Error - No response:', {
-        url: error.config.url,
+        url: error.config?.url,
         message: error.message,
       });
+    } else {
+      console.error('API Error:', error.message);
     }
     return Promise.reject(error);
   }
