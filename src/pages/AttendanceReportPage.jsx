@@ -34,6 +34,14 @@ export default function AttendanceReportPage() {
   const members = useApiResource('/members');
   const memberOptions = useMemo(() => members.data || [], [members.data]);
 
+  // Auto-clear messages after 5 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const loadReport = async () => {
     try {
       setLoading(true);
@@ -66,18 +74,35 @@ export default function AttendanceReportPage() {
   };
 
   const saveAttendance = async () => {
+    // Validate form
+    if (!form.memberId) {
+      setMessage('Please select a member');
+      return;
+    }
+    if (!form.date) {
+      setMessage('Please select a date');
+      return;
+    }
+    
     try {
       setLoading(true);
       setMessage('');
       if (editingId) {
         await api.put(`/attendance/${editingId}`, form);
+        setMessage('✅ Attendance updated successfully');
       } else {
         await api.post('/attendance/check-in', form);
+        setMessage('✅ Attendance saved successfully');
       }
       resetForm();
-      await loadReport();
+      // Reload after a short delay so user sees the success message
+      setTimeout(() => {
+        void loadReport();
+      }, 500);
     } catch (error) {
-      setMessage(error?.response?.data?.message || 'Attendance save failed');
+      const errorMsg = error?.response?.data?.message || error?.message || 'Attendance save failed';
+      setMessage(`❌ Error: ${errorMsg}`);
+      console.error('Save attendance error:', error);
     } finally {
       setLoading(false);
     }
@@ -151,15 +176,23 @@ export default function AttendanceReportPage() {
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
               <button type="button" onClick={saveAttendance} disabled={loading} className="btn-primary">
-                {editingId ? 'Update Attendance' : 'Save Attendance'}
+                {loading ? (editingId ? 'Updating...' : 'Saving...') : editingId ? 'Update Attendance' : 'Save Attendance'}
               </button>
               {editingId && (
-                <button type="button" onClick={resetForm} className="rounded-2xl border border-white/15 px-5 py-3.5 text-base font-bold text-white transition hover:bg-white/10">
+                <button type="button" onClick={resetForm} disabled={loading} className="rounded-2xl border border-white/15 px-5 py-3.5 text-base font-bold text-white transition hover:bg-white/10 disabled:opacity-50">
                   Cancel
                 </button>
               )}
             </div>
-            {message && <p className="mt-4 rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">{message}</p>}
+            {message && (
+              <p className={`mt-4 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                message.includes('✅') 
+                  ? 'border border-green-500/30 bg-green-500/10 text-green-200' 
+                  : 'border border-rose-500/30 bg-rose-500/10 text-rose-200'
+              }`}>
+                {message}
+              </p>
+            )}
           </div>
 
           <div className="glass rounded-3xl p-6 sm:p-8 animate-scaleIn">
